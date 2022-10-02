@@ -1,189 +1,62 @@
-const currencies = [{
-    id: 'USD', name: 'US Dollars'
-  },
-  {
-    id: 'GBP', name: 'Great Britain Pound'
-  },
-  {
-    id: 'BRL', name: ' Brazilian Real'
-  },
-  {
-    id: 'UGX', name: 'Ugandan Shillings'
-  },
-  {
-    id: 'AUD', name: 'Australian Dollar'
-  },
-  {
-    id: 'CAD', name: 'Canadian Dollar'
-  },{
-    id: 'EUR', name: 'Euro'
-  },
-  {
-    id: 'KRW', name: 'South Korean Won'
-  },
-  {
-    id: 'KES', name: 'Kenyan Shillings'
-  },
-  {
-    id: 'CHF', name: 'Swiss Franc'
-  },
-  {
-    id: 'GHS', name: 'Ghanian Cedi'
-  },
-  
-  {
-    id: 'INR', name: 'Indian Rupee'
-  },
-  {
-    id: 'ZAR', name: 'South African Rand'
-  },
-  {
-    id: 'ILS', name: 'Israeli Shekel'
-  },
-  {
-    id: 'JPY', name: 'Japanese Yen'
-  },
-  {
-    id: 'NGN', name: 'Nigerian Naira'
-  },
-  {
-    id: 'CNY', name: 'Chinese Yuan'
-  },
-  {
-    id: 'RUB', name: 'Russian Ruble'
-  }];
-  
-  const apiBase = 'https://free.currencyconverterapi.com/api/v6/';
-  const api = (currency,currency2) => `
-    ${apiBase}convert?q=${currency}_${currency2}&compact=ultra&apiKey=bc3c1ae7e4fe84c4cce0`;
+const dropList = document.querySelectorAll("form select"),
+fromCurrency = document.querySelector(".from select"),
+toCurrency = document.querySelector(".to select"),
+getButton = document.querySelector("form button");
 
-    const toast = (msg) => {
-        const toastr = document.querySelector('.messages');
-        if(!toastr) return;
-        
-        toastr.textContent = msg;
-        if(!toastr.classList.contains('on')) {
-          toastr.classList.add('on');
-        }
-      };
-
-      const doneToasting = () => {
-        const toastr = document.querySelector('.messages');
-        if(!toastr) return;
-        
-        toastr.textContent = '';
-        toastr.classList.remove('on');
-      };
-      
-
-      const conversionSucceeded = (apiResponse) => {
-        if(!apiResponse) {
-          toast(`nothing to display ...`);
-          return;
-        }
-        const [value] = Object.values(apiResponse) // if response is true return value showing the convert rate
-
-        const btn = document.querySelector('button');
-        btn.removeAttribute('disabled');
-
-    const display = document.querySelector('.conversion');
-    const formatter = new Intl.NumberFormat(
-        'en-NG', { style: 'currency', currency: `${getSelectedCurrency2()}`}
-
-    );
-
-    let amount=document.getElementById("Amount").value;
-    amount=amount==0?1:amount;
-    display.textContent = formatter.format(value*amount); // command to convert currency in user given amount
-    doneToasting(); // note that this doneToasting was declared before now this is going to show the convert rate is set this to be doneToasting
-  };
-
-  const createNode=(element) =>{
-      return document.createElement(element);
-  }
-
-  const append=(parent, el)=> {
-      return parent.appendChild(el);
-  }
-  const populateCurrencies=()=>{
-      currencies.map(c => {
-        let opt= createNode("option");
-        opt.setAttribute("value",c.id);
-        let text=document.createTextNode(`${c.name}`)
-        append(opt,text);
-        let sel=document.getElementsByClassName("select-text")[0];
-        append(sel,opt);
-      } );
-  }
-  const populateCurrencies2=()=>{
-    currencies.map(c => {
-      let opt= createNode("option");
-      opt.setAttribute("value",c.id);
-      let text=document.createTextNode(`${c.name}`)
-      append(opt,text);
-      let sel=document.getElementsByClassName("select-text")[1];
-      append(sel,opt);
-    } );
-  }
-
-  const getSelectedCurrency = () =>{
-      // here, determine and return the selected value
-      // of the SELECT element
-      return document.getElementsByClassName("select-text")[0].value;
-  };
-  
-  const getSelectedCurrency2 = () =>{
-    // here, determine and return the selected value
-    // of the SELECT element
-    return document.getElementsByClassName("select-text")[1].value;
-  };
-
-  // function to convert currency
-  const convert = (event) => {
-    toast(`preparing to convert ....`);
-
-    const btn = event ?
-        event.target : document.querySelector('button');
-
-    const selected = getSelectedCurrency();
-
-    if(!selected|| selected.trim() === ''
-    || !currencies.map(c => c.id).includes(selected)) return;
-
-    const selected2 = getSelectedCurrency2();
-
-    if(!selected2|| selected2.trim() === ''
-    || !currencies.map(c => c.id).includes(selected2)) return;
-
-    btn.setAttribute('disabled', 'disabled');
-    toast(`converting ...`);
-
-    const endpoint = api(selected,selected2);
-
-    // make a GET fetch call to the endpoint
-    // variable declared above, convert the response to JSON,
-    // then call conversionSucceeded and pass the JSON data to it
-
-    fetch(endpoint) // Call the fetch function passing the url of the API as a parameter
-    .then((resp) => resp.json())
-    .then((data) =>{
-        conversionSucceeded(data);
-    })
-    .catch((error)=>{
-        console.log(error);
+for (let i = 0; i < dropList.length; i++) {
+    for(let currency_code in country_list){
+        let selected = i == 0 ? currency_code == "USD" ? "selected" : "" : currency_code == "NPR" ? "selected" : "";
+        let optionTag = `<option value="${currency_code}" ${selected}>${currency_code}</option>`;
+        dropList[i].insertAdjacentHTML("beforeend", optionTag);
+    }
+    dropList[i].addEventListener("change", e =>{
+        loadFlag(e.target);
     });
-  };
+}
 
-  const startApp = () =>{
-      // call populateCurrencies here
-      populateCurrencies();
-      populateCurrencies2();
-      // add a click listener to the button here
-      let draw = document.getElementsByClassName("btn")[0];
-      draw.addEventListener("click", ()=>{
-        document.getElementsByClassName("conversion")[0].style.display="block";
-        convert(event);
-      });
-  }
-  startApp(); // now i have called the function so this app will work now
+function loadFlag(element){
+    for(let code in country_list){
+        if(code == element.value){
+            let imgTag = element.parentElement.querySelector("img");
+            imgTag.src = `https://flagcdn.com/48x36/${country_list[code].toLowerCase()}.png`;
+        }
+    }
+}
 
+window.addEventListener("load", ()=>{
+    getExchangeRate();
+});
+
+getButton.addEventListener("click", e =>{
+    e.preventDefault();
+    getExchangeRate();
+});
+
+const exchangeIcon = document.querySelector("form .icon");
+exchangeIcon.addEventListener("click", ()=>{
+    let tempCode = fromCurrency.value;
+    fromCurrency.value = toCurrency.value;
+    toCurrency.value = tempCode;
+    loadFlag(fromCurrency);
+    loadFlag(toCurrency);
+    getExchangeRate();
+})
+
+function getExchangeRate(){
+    const amount = document.querySelector("form input");
+    const exchangeRateTxt = document.querySelector("form .exchange-rate");
+    let amountVal = amount.value;
+    if(amountVal == "" || amountVal == "0"){
+        amount.value = "1";
+        amountVal = 1;
+    }
+    exchangeRateTxt.innerText = "Getting exchange rate...";
+    let url = `https://v6.exchangerate-api.com/v6/8326aac38c31a8ea60f89f20/latest/${fromCurrency.value}`;
+    fetch(url).then(response => response.json()).then(result =>{
+        let exchangeRate = result.conversion_rates[toCurrency.value];
+        let totalExRate = (amountVal * exchangeRate).toFixed(2);
+        exchangeRateTxt.innerText = `${amountVal} ${fromCurrency.value} = ${totalExRate} ${toCurrency.value}`;
+    }).catch(() =>{
+        exchangeRateTxt.innerText = "Something went wrong";
+    });
+}
